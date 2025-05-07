@@ -1,0 +1,94 @@
+name: Build for All Platforms (Windows, macOS, APK, IPA, AAB)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+      - name: Build for Windows
+        run: |
+          pyinstaller --onefile --windowed your_script.py
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+      - name: Build for macOS
+        run: |
+          pyinstaller --onefile --windowed your_script.py
+
+  build-android-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Buildozer and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake
+          pip install buildozer cython==0.29.36 virtualenv
+      - name: Build APK
+        run: |
+          buildozer init
+          buildozer -v android debug
+
+  build-android-aab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Buildozer and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake
+          pip install buildozer cython==0.29.36 virtualenv
+      - name: Build AAB
+        run: |
+          buildozer init
+          echo "android.release_artifact = aab" >> buildozer.spec
+          buildozer -v android release
+
+  build-ios-ipa:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Kivy and dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install kivy
+      - name: Build IPA (iOS)
+        run: |
+          echo "iOS builds require Xcode and additional setup"
+          # يمكنك إضافة خطوات بناء iOS هنا إذا كان لديك شهادة مطور Apple
